@@ -36,7 +36,18 @@ def create_map(df):
 		# Get the number of rows for the current department
 		department_data = df[df['Département'] == code]
 		num_rows = len(department_data)
-		
+  
+		# Calculate the color based on the number of fires
+		department_color = calculate_color(num_rows)
+  
+		# Créer une couche GeoJSON pour chaque département
+		department_layer = folium.GeoJson(
+      geometry,
+      name=f'Department {code}',
+      tooltip=f'Department {code} - {nom}',
+      style_function=lambda x, color=department_color: {'fillColor': color, 'color': 'black', 'weight': 1, 'fillOpacity': 1}
+    )
+  
 		# Add a popup with department data
 		popup_html = f'<b>Department:</b> {nom}<br><b>Code:</b> {code} <br><b>Number of Fire:</b> {num_rows}'
 		folium.Popup(popup_html).add_to(department_layer)
@@ -45,6 +56,24 @@ def create_map(df):
 		department_layer.add_to(m)
   
 	return m
+
+
+# Function to calculate a color gradient based on the number of fires
+def calculate_color(num_fires):
+    # Adjust the color scale as needed
+    color_scale = ['#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000', '#990000']
+    if num_fires < 5:
+      return color_scale[0]
+    elif num_fires < 10:
+      return color_scale[1]
+    elif num_fires < 20:
+      return color_scale[2]
+    elif num_fires < 30:
+      return color_scale[3]
+    elif num_fires < 50:
+      return color_scale[4]
+    else:
+      return color_scale[5]
 
 
 
@@ -62,5 +91,6 @@ def department(df, department_code, st_data):
   # Display the selected commune
   st.write("Selected Commune:", selected_commune)
 		
-    
+
+
     
