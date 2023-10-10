@@ -1,5 +1,7 @@
 import folium
 import json
+import streamlit as st
+
 
 
 def create_map(df):
@@ -15,6 +17,14 @@ def create_map(df):
 		code = feature['properties']['code']
 		nom = feature['properties']['nom']
 		geometry = feature['geometry']
+		
+		#coordinates
+		if geometry['type'] == 'Polygon':
+			coordinates = geometry['coordinates'][0] #prd les coordonnées du 1er anneau supérieur
+			latitudes = [point[1] for point in coordinates]
+			longitudes = [point[0] for point in coordinates]
+			center_latitude = sum(latitudes) / len(latitudes) #calcule la moy de latitude dans le dep
+			center_longitude = sum(longitudes) / len(longitudes) #calcule la moy de lg dans le dep
     
 		# Créer une couche GeoJSON pour chaque département
 		department_layer = folium.GeoJson(
@@ -36,3 +46,21 @@ def create_map(df):
   
 	return m
 
+
+
+def department(df, department_code, st_data):
+  # Filtrer les données pour le département sélectionné
+  department_data = df[df['Département'] == department_code]
+    
+  communes_in_department = sorted(department_data['Nom de la commune'].tolist())
+    
+  st.header(f"Communes in Department {department_code}")
+    
+  # Use a selectbox to choose a commune
+  selected_commune = st.selectbox("Select a Commune:", communes_in_department)
+    
+  # Display the selected commune
+  st.write("Selected Commune:", selected_commune)
+		
+    
+    

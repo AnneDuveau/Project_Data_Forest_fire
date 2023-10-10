@@ -7,6 +7,7 @@ import folium
 import json
 from streamlit_folium import st_folium
 import france_map as f
+import matplotlib.pyplot as plt
 
 
 # Function to load data with caching
@@ -54,21 +55,17 @@ def choose_data():
 		
 		st.header("France Wildfire Department Map")
 		folium_map = f.create_map(df)
-		st_data = st_folium(folium_map, width=725)
+		st_data = st_folium(folium_map, width=700)
+  
+		# Add a placeholder to dynamically display the selectbox
+		selectbox_placeholder = st.empty()
+  
+		 # After the map is displayed, call the department function
+		selected_department = st.selectbox("Select a Department", sorted(df['Département'].unique()))
+    
+    # Display department data using the st_data variable
+		f.department(df, selected_department, st_data)
 
-	
-		# Display department data when a region is clicked
-		st.write("Department Data:")
-		if isinstance(st_data, dict) and 'json_data' in st_data:
-			selected_region = st_data.json_data
-			if selected_region:
-				department_code = selected_region.get('name')
-				st.write(f"Selected Department: {department_code}")
-            
-				# Get the number of rows for the selected department
-				num_rows = len(df[df['Département'] == department_code])
-				st.write(f"Number of fire: {num_rows}")
-	
 	
 if __name__ == "__main__":
 	add_sidebar()
@@ -76,10 +73,4 @@ if __name__ == "__main__":
 
 
 
-# idée:
-# entrée, je voudrai une carte de france découpé en fonction des départements
-# on pourrait sélectionner une date d'incendie et voir plusieurs paramètres
-# la température (si non nulle)
-# la vitesse du vent (si non nulle)
-# hygrométrie (si non nulle)
-# le nombre
+
