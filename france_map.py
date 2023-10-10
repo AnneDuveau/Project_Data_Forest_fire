@@ -26,13 +26,6 @@ def create_map(df):
 			center_latitude = sum(latitudes) / len(latitudes) #calcule la moy de latitude dans le dep
 			center_longitude = sum(longitudes) / len(longitudes) #calcule la moy de lg dans le dep
     
-		# Créer une couche GeoJSON pour chaque département
-		department_layer = folium.GeoJson(
-			geometry,
-			name=f'Department {code}',
-			tooltip=f'Department {code} - {nom}'
-		)
-		
 		# Get the number of rows for the current department
 		department_data = df[df['Département'] == code]
 		num_rows = len(department_data)
@@ -50,11 +43,11 @@ def create_map(df):
   
 		# Add a popup with department data
 		popup_html = f'<b>Department:</b> {nom}<br><b>Code:</b> {code} <br><b>Number of Fire:</b> {num_rows}'
-		folium.Popup(popup_html).add_to(department_layer)
+		folium.Popup(popup_html, max_width=200, color='blue').add_to(department_layer)
 
 		# Add the department layer to the map
 		department_layer.add_to(m)
-  
+ 
 	return m
 
 
@@ -81,7 +74,7 @@ def department(df, department_code, st_data):
   # Filtrer les données pour le département sélectionné
   department_data = df[df['Département'] == department_code]
     
-  communes_in_department = sorted(department_data['Nom de la commune'].tolist())
+  communes_in_department = sorted(department_data['Nom de la commune'].unique().tolist())
     
   st.header(f"Communes in Department {department_code}")
     
@@ -90,7 +83,3 @@ def department(df, department_code, st_data):
     
   # Display the selected commune
   st.write("Selected Commune:", selected_commune)
-		
-
-
-    

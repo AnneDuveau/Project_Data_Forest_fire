@@ -6,9 +6,10 @@ import geopandas as gpd
 import folium
 import json
 from streamlit_folium import st_folium
-import france_map as f
 import matplotlib.pyplot as plt
 
+import france_map as f
+import graph as g
 
 # Function to load data with caching
 @st.cache_data
@@ -45,13 +46,14 @@ def choose_data():
 
 
 		# Sample 1000 random rows from the DataFrame
-		sample_df = df.iloc[1:].sample(n=1000, random_state=42)
+		sample_df = df.iloc[1:].sample(n=3000, random_state=42)
 		sample_df = pd.concat([df.iloc[:1], sample_df])
 
+		sample_df = g.clean_data(sample_df)
+  
 		# Display the sampled data
-		st.write("Random sample of 1000 rows:")
+		st.write("Random sample of 3000 rows:")
 		st.write(sample_df)
-		
 		
 		st.header("France Wildfire Department Map")
 		folium_map = f.create_map(df)
@@ -62,15 +64,17 @@ def choose_data():
   
 		 # After the map is displayed, call the department function
 		selected_department = st.selectbox("Select a Department", sorted(df['Département'].unique()))
-    
+  
     # Display department data using the st_data variable
 		f.department(df, selected_department, st_data)
+  
+	return sample_df
 
 	
 if __name__ == "__main__":
 	add_sidebar()
-	choose_data()
-
-
+	sample_df = choose_data()
+ 
+	g.show_plots(sample_df)
 
 
