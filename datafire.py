@@ -7,7 +7,6 @@ import folium
 import json
 from streamlit_folium import st_folium
 import matplotlib.pyplot as plt
-
 import france_map as f
 import graph as g
 

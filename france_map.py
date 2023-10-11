@@ -1,6 +1,7 @@
 import folium
 import json
 import streamlit as st
+import pandas as pd
 
 
 def create_map(df):
@@ -72,7 +73,9 @@ def calculate_color(num_fires):
 def department(df, department_code, st_data):
   # Filtrer les données pour le département sélectionné
   department_data = df[df['Département'] == department_code]
-    
+  
+  department_data.loc[:, 'Nom de la commune'] = department_data['Nom de la commune'].astype(str)
+
   communes_in_department = sorted(department_data['Nom de la commune'].unique().tolist())
     
   st.header(f"Communes in Department {department_code}")
@@ -86,11 +89,37 @@ def department(df, department_code, st_data):
   # Afficher les informations pour chaque incendie enregistré dans la commune sélectionnée
   selected_incidents = department_data[department_data['Nom de la commune'] == selected_commune]  
   
+  
   for i, incident in selected_incidents.iterrows():
-        st.subheader(f"Incident {i+1}")
-        st.write(f"Date de l'incendie: {incident['Date de première alerte']}")
-        if 'Température' in incident:
-            st.write(f"Température: {incident['Température']} °C")
-        if 'Direction du vent' in incident and 'Vitesse du vent' in incident:
-            st.write(f"Direction du vent: {incident['Direction du vent']}°")
-            st.write(f"Vitesse du vent: {incident['Vitesse du vent']} km/h")
+    st.subheader(f"Incident {i+1}")
+    
+    st.write(f"Date de l'incendie: {incident['Date de première alerte']}")
+    col1, col2, col3 = st.columns(3)
+    
+    if pd.notnull(incident['Température (°C)']):
+        col1.markdown(f'<h4 style="font-size: 18px;">Température</h4>', unsafe_allow_html=True)
+        temperature_value = f"{incident['Température (°C)']} °C"
+        font_size = 50
+        styled_temperature = f'<span style="background-color: green; color: white; padding: 2px; border-radius: 5px; font-size: {font_size}px; ">{temperature_value}</span>'
+        col1.markdown(styled_temperature, unsafe_allow_html=True)
+
+    if pd.notnull(incident['Direction du vent']): 
+        col2.markdown(f'<h4 style="font-size: 18px;">Direction du vent</h4>', unsafe_allow_html=True)
+        direction_value = f"{incident['Direction du vent']}"
+        font_size = 50
+        styled_direction = f'<span style="background-color: blue; color: white; padding: 2px; border-radius: 5px; font-size: {font_size}px; ">{direction_value}</span>'
+        col2.markdown(styled_direction, unsafe_allow_html=True)
+        
+    if pd.notnull(incident['Vitesse moyenne du vent (Km/h)']):
+        col3.markdown(f'<h4 style="font-size: 18px;">Vitesse moyenne du vent</h4>', unsafe_allow_html=True)
+        vitesse_value = f"{incident['Vitesse moyenne du vent (Km/h)']} Km/h"
+        font_size = 50
+        styled_vitesse = f'<span style="background-color: yellow; color: black; padding: 2px; border-radius: 5px; font-size: {font_size}px; ">{vitesse_value}</span>'
+        col3.markdown(styled_vitesse, unsafe_allow_html=True)
+    
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    # Ajoutez une ligne séparatrice
+    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
+        
