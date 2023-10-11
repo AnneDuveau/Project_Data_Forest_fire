@@ -3,7 +3,6 @@ import json
 import streamlit as st
 
 
-
 def create_map(df):
 	# Charger les données géographiques des départements de France
 	with open('dep_France.geojson', 'r') as file:
@@ -83,3 +82,15 @@ def department(df, department_code, st_data):
     
   # Display the selected commune
   st.write("Selected Commune:", selected_commune)
+  
+  # Afficher les informations pour chaque incendie enregistré dans la commune sélectionnée
+  selected_incidents = department_data[department_data['Nom de la commune'] == selected_commune]  
+  
+  for i, incident in selected_incidents.iterrows():
+        st.subheader(f"Incident {i+1}")
+        st.write(f"Date de l'incendie: {incident['Date de première alerte']}")
+        if 'Température' in incident:
+            st.write(f"Température: {incident['Température']} °C")
+        if 'Direction du vent' in incident and 'Vitesse du vent' in incident:
+            st.write(f"Direction du vent: {incident['Direction du vent']}°")
+            st.write(f"Vitesse du vent: {incident['Vitesse du vent']} km/h")
